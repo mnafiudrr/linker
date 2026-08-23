@@ -88,12 +88,15 @@ async function getScopedBreadcrumb(
     return row ? [row] : [];
   }
 
+  // Ascend only while the current node is not the share root, so ancestors
+  // above the share boundary are never read (privacy: their names must not
+  // even reach this query's result).
   const rows = await db.execute<{ id: string; name: string; depth: number }>(sql`
     WITH RECURSIVE chain AS (
       SELECT id, parent_id, name, 0 AS depth FROM folders WHERE id = ${currentId}
       UNION ALL
       SELECT f.id, f.parent_id, f.name, c.depth + 1
-      FROM folders f JOIN chain c ON f.id = c.parent_id
+      FROM folders f JOIN chain c ON f.id = c.parent_id AND c.id != ${rootId}
     )
     SELECT id, name, depth FROM chain WHERE id != ${currentId} ORDER BY depth DESC
   `);
