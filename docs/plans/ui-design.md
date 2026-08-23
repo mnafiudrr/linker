@@ -17,80 +17,68 @@
 
 ## 2. Color System
 
-Brand color: **Baby Blue** (`#89CFF0`) — a soft, calm pastel. Because baby blue is light, primary surfaces pair it with **deep navy text** (`#0C2D42`) instead of white to keep AA+ contrast. The full ramp below supports hover/active states in both themes.
+Brand palette (issue #2): **Sky Blue `#67AEEE`** (primary) · **Soft Lilac `#FBD3FF`** (selected/secondary accent) · **Soft Peach `#FFDBD0`** (warm accent/warning surfaces) · **Light Baby Blue `#D4EEFF`** (surface tint). Sky Blue is light enough that primary surfaces pair it with **deep navy text** (`on-primary`) for AA+ contrast.
 
 ### Brand / Accent — Light Theme
 
 | Token | Hex | Usage |
 |---|---|---|
-| `primary-50` | `#EFF9FE` | Subtle highlights, badges, empty-state icon circles |
-| `primary-100` | `#D9F0FB` | Selected row/card background |
-| `primary-200` | `#BCE3F7` | Hover on selected items, soft borders |
-| `primary-300` | `#89CFF0` ★ brand core | Primary button bg, active nav bg, focus rings |
-| `primary-400` | `#5FB4E0` | Primary button hover, links on light bg |
-| `primary-500` | `#3E97C9` | Active/pressed states |
-| `primary-600` | `#2C7CAD` | Text links (AA on white), strong accents |
-| `primary-700` | `#1F6188` | Deep accent text, pressed link states |
-| `on-primary` | `#0C2D42` | Text/icons on any baby-blue surface (contrast ≈ 9:1) |
+| `primary-50` | `#EFF7FE` | Subtle highlights, badges, empty-state icon circles |
+| `primary-100` | `#DDF0FD` | Selected row/card background |
+| `primary-200` | `#C2E4FC` | Hover on selected items, soft borders |
+| `primary-300` | `#67AEEE` ★ Sky Blue | Primary button bg, active nav bg, focus rings |
+| `primary-400` | `#4E97DB` | Primary button hover |
+| `primary-500` | `#357DC2` | Active/pressed states |
+| `primary-600` | `#2563A6` | Text links (AA on white), strong accents |
+| `primary-700` | `#1B4C82` | Deep accent text, pressed link states |
+| `on-primary` | `#0B2440` | Text/icons on any sky-blue surface |
 
-### Neutrals — Light Theme
+### Neutrals — Light Theme (tinted toward Light Baby Blue)
 
 | Token | Hex | Usage |
 |---|---|---|
 | `bg-base` | `#FFFFFF` | Page background |
-| `bg-subtle` | `#F5FAFD` (blue-tinted) | Sidebar, cards-on-hover, section backgrounds |
-| `border-default` | `#DBE7EF` (blue-tinted) | Dividers, card borders, inputs |
-| `text-primary` | `#10222E` (navy-tinted) | Headings, primary text |
-| `text-secondary` | `#43586A` | Descriptions, metadata |
-| `text-muted` | `#8CA3B5` | Placeholders, timestamps, disabled |
+| `bg-subtle` | `#EEF8FE` | Sidebar, cards-on-hover, section backgrounds |
+| `border-default` | `#CFE6F7` | Dividers, card borders, inputs |
+| `text-primary` | `#10243A` | Headings, primary text |
+| `text-secondary` | `#40556B` | Descriptions, metadata |
+| `text-muted` | `#8598AC` | Placeholders, timestamps, disabled |
 
-### Semantic Colors — Light Theme
+### Semantic & Secondary Accents — Light Theme
 
 | Token | Hex | Usage |
 |---|---|---|
 | `success` | `#15803D` | Saved/toast confirmations |
-| `warning` | `#B45309` | Destructive-confirm banners, expiring share notice |
-| `danger` | `#DC2626` | Delete buttons, destructive hover, error text |
-| `danger-bg` | `#FEF2F2` | Danger hover surfaces |
-| `info` | `primary-600` (`#2C7CAD`) | Read-only banner, informational toasts |
+| `warning` / `warning-bg` | `#9A3412` on **`#FFDBD0` Soft Peach** | Destructive-confirm banners, expiring share notice |
+| `danger` / `danger-bg` | `#DC2626` / `#FEF2F2` | Delete buttons, destructive hover, error text |
+| `info` | `primary-600` (`#2563A6`) | Read-only banner, informational toasts |
+| `accent-lilac(-soft)` | **`#FBD3FF`** (`#FDEFFD`) | Selected states, badges, decorative highlights |
+| `accent-peach(-soft)` | **`#FFDBD0`** (`#FFF4EF`) | Warm highlights, share indicators |
 
 ### Dark Theme
 
-Blue-tinted charcoal surfaces; the baby-blue core stays as accent and gains contrast against dark backgrounds.
+Blue-charcoal surfaces; anchors stay recognizable and gain contrast.
 
-**Brand / Accent — Dark**
-
-| Token | Hex | Usage |
+| Token | Hex (dark) | Light counterpart note |
 |---|---|---|
-| `primary-50` | `#12283A` | Subtle highlights, badges |
-| `primary-100` | `#17334A` | Selected row/card background |
-| `primary-200` | `#1E425E` | Hover on selected items, soft borders |
-| `primary-300` | `#89CFF0` ★ brand core | Focus rings, active nav text/icons, links |
-| `primary-400` | `#A6DCF6` | Link hover, emphasized accents |
-| `on-primary` | `#082136` | Text/icons on baby-blue surfaces (buttons unchanged) |
-
-**Neutrals & Semantics — Dark**
-
-| Token | Hex | Usage |
-|---|---|---|
-| `bg-base` | `#0A141D` | Page background |
-| `bg-subtle` | `#101E2B` | Sidebar, cards-on-hover |
-| `border-default` | `#1D3346` | Dividers, card borders, inputs |
-| `text-primary` | `#E8F3FB` | Headings, primary text |
-| `text-secondary` | `#A9C2D4` | Descriptions, metadata |
-| `text-muted` | `#64829A` | Placeholders, timestamps, disabled |
-| `success` | `#4ADE80` | Confirmations |
-| `warning` | `#FBBF24` | Warning banners |
-| `danger` | `#F87171` | Delete actions, error text |
-| `danger-bg` | `#3B1214` | Danger hover surfaces |
-| `info` | `#89CFF0` | Read-only banner, info toasts |
+| `primary-50..200` | `#122436` / `#17324C` / `#1E4263` | Selected/hover surfaces |
+| `primary-300` | `#67AEEE` ★ | Focus rings, active nav, links |
+| `primary-400` | `#8CC5F5` | Link hover, emphasized accents |
+| `on-primary` | `#081C33` | Text on sky-blue surfaces (buttons unchanged) |
+| `bg-base` / `bg-subtle` | `#0A141E` / `#0F1E2C` | Page/sidebar backgrounds |
+| `border-default` | `#1C3145` | Dividers, borders, inputs |
+| `text-primary/secondary/muted` | `#E9F3FB` / `#A6BED4` / `#63809A` | Text tiers |
+| `success` / `warning` / `danger` | `#4ADE80` / `#FFB380` / `#F87171` | Semantic brightened |
+| `warning-bg` / `danger-bg` | `#3B241B` / `#3B1214` | Banner/error surfaces |
+| `accent-lilac(-soft)` | `#FBD3FF` (`#37203B`) | Badges/highlights |
+| `accent-peach(-soft)` | `#FFDBD0` (`#3B241B`) | Warm highlights |
 
 ### Theme Rules
 
-- Toggle via class strategy (`dark:` variants); default follows `prefers-color-scheme`, manual toggle post-MVP.
-- **Buttons stay identical across themes**: baby-blue bg + navy `on-primary` text — passes contrast in both.
+- Theme is class-based: `.dark` on `<html>` toggles the palette (see issue #3); default is **light**.
+- **Buttons stay identical across themes**: sky-blue bg + navy `on-primary` text — passes contrast in both.
 - Never hardcode hex in components — tokens only; every component must define both themes.
-- Blue-tinted neutrals are mandatory: pure gray (`#F9FAFB`, `#E5E7EB`) is forbidden — all neutrals carry the same hue family as baby blue for cohesion.
+- All neutrals carry the same hue family as the brand anchors; pure gray is forbidden.
 
 ## 3. Typography
 
