@@ -3,10 +3,17 @@ FROM node:22-alpine AS base
 WORKDIR /app
 RUN apk add --no-cache libc6-compat
 
-# --- dev (docker-compose dev profile) ---
+# --- dev (docker-compose dev profile, hot reload) ---
 FROM base AS dev
 ENV NODE_ENV=development
-CMD ["npm", "run", "dev"]
+# Polling keeps file watching reliable across bind mounts.
+ENV WATCHPACK_POLLING=true
+COPY package.json package-lock.json ./
+RUN npm ci
+EXPOSE 3000
+# Source is bind-mounted at runtime; node_modules/.next stay container-owned
+# (see the anonymous volumes in docker-compose.yml).
+CMD ["npm", "run", "dev", "--", "--hostname", "0.0.0.0"]
 
 # --- deps: full install incl. devDependencies (drizzle-kit for migrations) ---
 FROM base AS deps
