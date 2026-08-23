@@ -57,7 +57,10 @@ export default async function SharePage({
       </div>
 
       <header className="border-b border-line px-4 py-4 md:px-8">
-        <nav aria-label="Breadcrumb" className="text-xs text-content-muted">
+        <nav
+          aria-label="Breadcrumb"
+          className="overflow-x-auto whitespace-nowrap text-xs text-content-muted [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {view.breadcrumb.map((crumb, index) => {
             const isLast = index === view.breadcrumb.length - 1;
             return (

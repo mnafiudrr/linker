@@ -57,7 +57,10 @@ export default async function FolderPage({
   return (
     <>
       <header className="border-b border-line px-4 py-4 md:px-8">
-        <nav aria-label="Breadcrumb" className="mb-2 text-xs text-content-muted">
+        <nav
+          aria-label="Breadcrumb"
+          className="mb-2 overflow-x-auto whitespace-nowrap text-xs text-content-muted [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           <Link href="/dashboard" className="hover:text-content-secondary">
             My links
           </Link>
@@ -79,7 +82,9 @@ export default async function FolderPage({
         </nav>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="truncate text-2xl font-semibold tracking-tight">{folder.name}</h1>
+          <h1 className="min-w-0 flex-1 truncate text-xl font-semibold tracking-tight md:text-2xl">
+            {folder.name}
+          </h1>
           <div className="flex flex-wrap items-center gap-2">
             <span
               className={`rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${roleBadge[contents.access]}`}
