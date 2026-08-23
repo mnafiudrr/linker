@@ -1,6 +1,6 @@
 # 004 — Link CRUD
 
-- **Status:** pending
+- **Status:** done
 - **Depends on:** [003]
 
 ## Goal
