@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { getShareView } from "@/features/share/queries";
 import { ShareLinkCard } from "@/features/links/components/share-link-card";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export const metadata = { title: "Shared folder" };
 
@@ -44,8 +45,14 @@ export default async function SharePage({
 
   return (
     <>
-      <div role="status" className="bg-primary-300 px-4 py-2 text-center text-xs font-medium text-on-primary">
-        You are viewing a read-only shared folder.
+      <div
+        role="status"
+        className="flex items-center justify-between bg-primary-300 px-4 py-2 text-xs font-medium text-on-primary"
+      >
+        <span className="flex-1 text-center">
+          You are viewing a read-only shared folder.
+        </span>
+        <ThemeToggle className="hover:bg-primary-400" />
       </div>
 
       <header className="border-b border-line px-4 py-4 md:px-8">
