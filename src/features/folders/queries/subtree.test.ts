@@ -55,16 +55,19 @@ describe("folder tree queries", () => {
     const root = await insertFolder(null, "cascade-root");
     const child = await insertFolder(root.id, "cascade-child");
     await insertFolder(child.id, "cascade-grandchild");
-    await db
+    const [inserted] = await db
       .insert(links)
-      .values({ folderId: child.id, url: "https://example.com", title: "Example" });
+      .values({ folderId: child.id, url: "https://example.com", title: "Example" })
+      .returning();
+    if (!inserted) throw new Error("failed to seed link");
 
     await db.delete(folders).where(eq(folders.id, root.id));
 
     const remaining = await db.select().from(folders);
     expect(remaining.find((f) => f.name === "cascade-child")).toBeUndefined();
     expect(remaining.find((f) => f.name === "cascade-grandchild")).toBeUndefined();
-    expect(await db.select().from(links)).toHaveLength(0);
+    const survivingLink = await db.select().from(links).where(eq(links.id, inserted.id));
+    expect(survivingLink).toHaveLength(0);
   });
 
   it("rejects duplicate sibling names case-insensitively", async () => {

@@ -5,6 +5,9 @@ services:
       POSTGRES_USER: link
       POSTGRES_PASSWORD: link
       POSTGRES_DB: link
+    # Localhost-only so `npm test` / CLI tools can reach the DB.
+    ports:
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
