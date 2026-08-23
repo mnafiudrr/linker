@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/* Baby-blue brand palette — see docs/plans/ui-design.md §2 */
+:root {
+  --primary-50: #eff9fe;
+  --primary-100: #d9f0fb;
+  --primary-200: #bce3f7;
+  --primary-300: #89cff0;
+  --primary-400: #5fb4e0;
+  --primary-500: #3e97c9;
+  --primary-600: #2c7cad;
+  --primary-700: #1f6188;
+  --on-primary: #0c2d42;
+
+  --bg-base: #ffffff;
+  --bg-subtle: #f5fafd;
+  --border-default: #dbe7ef;
+  --text-primary: #10222e;
+  --text-secondary: #43586a;
+  --text-muted: #8ca3b5;
+
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #dc2626;
+  --danger-bg: #fef2f2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-50: #12283a;
+    --primary-100: #17334a;
+    --primary-200: #1e425e;
+    --primary-300: #89cff0;
+    --primary-400: #a6dcf6;
+    --on-primary: #082136;
+
+    --bg-base: #0a141d;
+    --bg-subtle: #101e2b;
+    --border-default: #1d3346;
+    --text-primary: #e8f3fb;
+    --text-secondary: #a9c2d4;
+    --text-muted: #64829a;
+
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --danger-bg: #3b1214;
+  }
+}
+
+@theme inline {
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-on-primary: var(--on-primary);
+
+  --color-base: var(--bg-base);
+  --color-subtle: var(--bg-subtle);
+  --color-line: var(--border-default);
+  --color-content: var(--text-primary);
+  --color-content-secondary: var(--text-secondary);
+  --color-content-muted: var(--text-muted);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  --shadow-e1: 0 1px 2px rgb(0 0 0 / 0.05);
+  --shadow-e2: 0 4px 12px rgb(0 0 0 / 0.1);
+  --shadow-e3: 0 16px 48px rgb(0 0 0 / 0.2);
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+}
