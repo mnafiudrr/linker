@@ -22,10 +22,30 @@ open http://localhost:3000    # sign up and start organizing
 For development with hot reload:
 
 ```bash
+docker compose --profile dev up -d dev   # postgres + next dev (hot reload)
+open http://localhost:3000
+```
+
+Or run only the database on the host:
+
+```bash
 docker compose up -d postgres   # database only
 npm install
 npm run dev                     # http://localhost:3000
 ```
+
+### Environment & ports
+
+All ports and credentials come from `.env` (see `.env.example`):
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `APP_PORT` | `3000` | Host port for the app (`dev` and prod containers) |
+| `POSTGRES_PORT` | `5432` | Host port for Postgres — bound to `127.0.0.1` only |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | `link` / `link` / `link` | Database credentials; the container-side `DATABASE_URL` is composed from these |
+| `DATABASE_URL` | `postgres://link:link@localhost:5432/link` | Used by host-side tooling and tests |
+| `BETTER_AUTH_URL` | `http://localhost:3000` | Auth base URL (update if you change `APP_PORT`) |
+| `BETTER_AUTH_SECRET` | — (required for prod) | Session signing secret |
 
 ## Scripts
 
