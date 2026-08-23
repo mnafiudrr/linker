@@ -16,8 +16,8 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-4 md:px-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Home</h1>
+      <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-line px-4 py-4 md:px-8">
+        <h1 className="text-xl font-semibold tracking-tight md:text-2xl">Home</h1>
         <CreateFolderDialog trigger={<Button variant="primary">+ New folder</Button>} />
       </header>
 
