@@ -26,7 +26,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await db.delete(users);
+  await db.delete(users).where(eq(users.id, userId));
 });
 
 async function insertFolder(parentId: string | null, name: string) {

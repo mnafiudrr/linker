@@ -40,6 +40,23 @@ export async function getFolderDepth(db: Database, parentId: string | null) {
 }
 
 /**
+ * Height of the subtree rooted at `folderId` (a leaf returns 0).
+ * Used to validate that moves keep the whole tree within the depth limit.
+ */
+export async function getSubtreeHeight(db: Database, folderId: string) {
+  const rows = await db.execute<{ height: number }>(sql`
+    WITH RECURSIVE subtree AS (
+      SELECT id, parent_id, 0 AS depth FROM folders WHERE id = ${folderId}
+      UNION ALL
+      SELECT f.id, f.parent_id, s.depth + 1 FROM folders f JOIN subtree s ON f.parent_id = s.id
+    )
+    SELECT COALESCE(MAX(depth), 0)::int AS height FROM subtree
+  `);
+  const [row] = rows;
+  return row ? Number(row.height) : 0;
+}
+
+/**
  * Ids of every ancestor above `folderId` (excluding it).
  * An empty result means the folder is a root.
  */

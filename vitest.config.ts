@@ -11,5 +11,7 @@ export default defineConfig({
   test: {
     include: ["src/**/*.test.ts"],
     hookTimeout: 30_000,
+    // Tests share one Postgres database — run files sequentially.
+    fileParallelism: false,
   },
 });

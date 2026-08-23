@@ -3,6 +3,7 @@ CREATE TABLE "accounts" (
 	"user_id" text NOT NULL,
 	"account_id" text NOT NULL,
 	"provider_id" text NOT NULL,
+	"issuer" text,
 	"access_token" text,
 	"refresh_token" text,
 	"id_token" text,
@@ -80,7 +81,7 @@ CREATE INDEX "sessions_user_id_idx" ON "sessions" USING btree ("user_id");--> st
 CREATE UNIQUE INDEX "users_email_unique" ON "users" USING btree ("email");--> statement-breakpoint
 CREATE INDEX "folders_owner_id_idx" ON "folders" USING btree ("owner_id");--> statement-breakpoint
 CREATE INDEX "folders_parent_id_idx" ON "folders" USING btree ("parent_id");--> statement-breakpoint
-CREATE UNIQUE INDEX "folders_sibling_name_unique" ON "folders" USING btree ("parent_id",lower("name"));--> statement-breakpoint
+CREATE UNIQUE INDEX "folders_sibling_name_unique" ON "folders" USING btree (coalesce("parent_id", '00000000-0000-0000-0000-000000000000'::uuid),lower("name"));--> statement-breakpoint
 CREATE INDEX "links_folder_id_idx" ON "links" USING btree ("folder_id");--> statement-breakpoint
 CREATE UNIQUE INDEX "share_links_token_unique" ON "share_links" USING btree ("token");--> statement-breakpoint
 CREATE INDEX "share_links_folder_id_idx" ON "share_links" USING btree ("folder_id");

@@ -1,5 +1,5 @@
 {
-  "id": "88c72d08-d6f6-459c-8789-beeeaace7762",
+  "id": "829a04cb-12c3-464a-93d3-61d6bb504937",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -31,6 +31,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "issuer": {
+          "name": "issuer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "access_token": {
           "name": "access_token",
@@ -388,9 +394,9 @@
           "name": "folders_sibling_name_unique",
           "columns": [
             {
-              "expression": "parent_id",
-              "isExpression": false,
+              "expression": "coalesce(\"parent_id\", '00000000-0000-0000-0000-000000000000'::uuid)",
               "asc": true,
+              "isExpression": true,
               "nulls": "last"
             },
             {

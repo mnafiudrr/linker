@@ -1,6 +1,6 @@
 # 003 — Folder CRUD
 
-- **Status:** pending
+- **Status:** done
 - **Depends on:** [002]
 
 ## Goal
