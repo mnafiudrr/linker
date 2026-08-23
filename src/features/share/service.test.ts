@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { getDb } from "@/db";
-import { folders, users } from "@/db/schema";
+import { users } from "@/db/schema";
 import { createFolder } from "@/features/folders/service";
 import { createLink } from "@/features/links/service";
 import { createShareForFolder, isValidShare, revokeShare } from "./service";

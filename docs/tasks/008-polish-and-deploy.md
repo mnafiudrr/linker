@@ -1,6 +1,6 @@
 # 008 — Polish & Deploy
 
-- **Status:** pending
+- **Status:** done
 - **Depends on:** [007]
 
 ## Goal

@@ -112,13 +112,13 @@ These are candidates for v2+.
 
 ## 7. Acceptance Criteria (MVP Exit)
 
-- [ ] User can register, log in, log out.
-- [ ] User can build a ≥ 3-level folder tree and CRUD links within it.
-- [ ] Pasting a known OG-enabled URL (e.g., a GitHub repo) auto-fills title/description/image.
-- [ ] Share link works in incognito browser with zero account interaction, showing the whole subtree read-only.
-- [ ] Revoked share returns 404-style page.
-- [ ] SSRF guard blocks requests to `127.0.0.1`, `169.254.x.x`, `10.x`, etc.
-- [ ] `docker compose up -d` starts app + Postgres, migrations applied automatically.
+- [x] User can register, log in, log out.
+- [x] User can build a ≥ 3-level folder tree and CRUD links within it.
+- [x] Pasting a known OG-enabled URL (e.g., a GitHub repo) auto-fills title/description/image.
+- [x] Share link works in incognito browser with zero account interaction, showing the whole subtree read-only.
+- [x] Revoked share returns 404-style page.
+- [x] SSRF guard blocks requests to `127.0.0.1`, `169.254.x.x`, `10.x`, etc.
+- [x] `docker compose up -d` starts app + Postgres, migrations applied automatically.
 
 ## 8. Success Metrics (post-MVP)
 
