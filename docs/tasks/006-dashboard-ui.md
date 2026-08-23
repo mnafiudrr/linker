@@ -1,6 +1,6 @@
 # 006 — Dashboard UI
 
-- **Status:** pending
+- **Status:** done
 - **Depends on:** [003, 004, 005]
 
 ## Goal

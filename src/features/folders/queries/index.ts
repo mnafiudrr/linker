@@ -20,6 +20,15 @@ export function getRootFolders(ownerId: string) {
     .orderBy(asc(folders.name));
 }
 
+/** Flat list of all owned folders — the sidebar tree is built client-side. */
+export function getAllOwnedFolders(ownerId: string) {
+  return getDb()
+    .select({ id: folders.id, name: folders.name, parentId: folders.parentId })
+    .from(folders)
+    .where(eq(folders.ownerId, ownerId))
+    .orderBy(asc(folders.name));
+}
+
 export async function getFolderContents(
   ownerId: string,
   folderId: string,
