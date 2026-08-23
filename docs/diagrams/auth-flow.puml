@@ -1,0 +1,52 @@
+@startuml auth-flow
+title Link — Authentication Flow (Better Auth)
+
+actor User
+participant "Better Auth\nserver" as auth
+database "PostgreSQL\n(users, sessions, accounts)" as db
+
+== Sign Up ==
+User -> auth : POST /sign-up\n{ name, email, password }
+activate auth
+auth -> auth : Zod validate\nhash password (bcrypt/argon2)
+auth -> db : INSERT users + account(credential)
+db --> auth : user
+auth -> db : CREATE session\n(HTTP-only, Secure, SameSite=Lax cookie)
+auth --> User : 200 → redirect /dashboard
+deactivate auth
+
+== Sign In ==
+User -> auth : POST /sign-in { email, password }
+activate auth
+auth -> db : SELECT user by email
+alt valid credentials
+  auth -> auth : verify hash
+  auth -> db : CREATE session row
+  auth --> User : session cookie → /dashboard
+else invalid
+  auth --> User : generic error message
+end
+deactivate auth
+
+== Authenticated Request ==
+User -> auth : request with session cookie
+activate auth
+auth -> db : validate session\n(exists, not expired)
+alt valid
+  auth --> User : request proceeds,\nctx.session.user available
+else expired/invalid
+  auth --> User : clear cookie → /sign-in
+end
+deactivate auth
+
+== Sign Out ==
+User -> auth : POST /sign-out
+auth -> db : DELETE session
+auth -> User : clear cookie
+
+note over db
+  users/sessions/accounts tables are
+  managed by Better Auth migrations
+end note
+
+@enduml

@@ -1,0 +1,58 @@
+@startuml api-and-actions-map
+title Link — API Routes & Server Actions Map
+
+rectangle "Next.js App Router" {
+
+  package "Route Groups" {
+    rectangle "(auth)\n/sign-in  /sign-up" as auth
+    rectangle "(dashboard)" as dash {
+      rectangle "/dashboard" as root
+      rectangle "/dashboard/folder/[id]" as folderview
+    }
+    rectangle "share/[token]\n(public, read-only)" as sharepage
+  }
+
+  package "API Route (JSON only)" {
+    rectangle "POST /api/links/metadata\n{url} → OG metadata | {}\nSSRF-guarded fetch" as metaapi
+  }
+
+  package "Server Actions (mutations)" {
+    rectangle "folders.actions\ncreateFolder\nrenameFolder\nmoveFolder\ndeleteFolder" as fa
+    rectangle "links.actions\ncreateLink\nupdateLink\nmoveLink\ndeleteLink" as la
+    rectangle "share.actions\ncreateShare\nrevokeShare" as sa
+  }
+
+  package "Queries (reads)" {
+    rectangle "folders.queries\ngetFolderContents\ngetBreadcrumb" as fq
+    rectangle "links.queries\ngetLinksInFolder" as lq
+    rectangle "share.queries\nresolveSharedSubtree(token)\nrecursive CTE" as sq
+  }
+}
+
+database PostgreSQL
+
+auth --> PostgreSQL
+root --> fq
+folderview --> fq
+fq --> PostgreSQL
+lq --> PostgreSQL
+sq --> PostgreSQL
+metaapi --> sites : http(s) fetch
+fa --> PostgreSQL
+la --> PostgreSQL
+sa --> PostgreSQL
+
+note bottom of metaapi
+  The ONLY REST route — exists because the client needs a JSON
+  response mid-form. All mutations use Server Actions instead.
+end note
+
+note right of fa
+  Every action:
+  1. Zod input validation
+  2. session check
+  3. ownership check
+     (owner_id === session.user.id)
+end note
+
+@enduml

@@ -1,0 +1,86 @@
+@startuml er-diagram
+title Link — Entity Relationship Diagram
+hide circle
+skinparam linetype ortho
+
+entity users {
+  * id : uuid <<pk>>
+  --
+  * name : text
+  * email : text <<unique>>
+  * email_verified : boolean
+    image : text
+  * created_at : timestamptz
+  * updated_at : timestamptz
+}
+
+entity sessions {
+  * id : text <<pk>>
+  --
+  * user_id : uuid <<fk>>
+  * expires_at : timestamptz
+}
+
+entity accounts {
+  * id : text <<pk>>
+  --
+  * user_id : uuid <<fk>>
+  * provider_id : text
+}
+
+entity folders {
+  * id : uuid <<pk>>
+  --
+  * owner_id : uuid <<fk>>
+  * parent_id : uuid <<fk, nullable>>
+  * name : text
+  * created_at : timestamptz
+  * updated_at : timestamptz
+}
+
+entity links {
+  * id : uuid <<pk>>
+  --
+  * folder_id : uuid <<fk>>
+  * url : text
+  * title : text
+    description : text
+    favicon_url : text
+    image_url : text
+    metadata_fetched_at : timestamptz
+  * created_at : timestamptz
+  * updated_at : timestamptz
+}
+
+entity share_links {
+  * id : uuid <<pk>>
+  --
+  * token : text <<unique>> (nanoid 21)
+  * folder_id : uuid <<fk>>
+  * created_by : uuid <<fk>>
+    expires_at : timestamptz
+    revoked_at : timestamptz
+  * created_at : timestamptz
+}
+
+users ||--o{ sessions : has
+users ||--o{ accounts : authenticates
+users ||--o{ folders : owns
+users ||--o{ share_links : creates
+
+folders ||--o{ folders : "parent_id\n(self-ref tree)"
+folders ||--o{ links : contains
+folders ||--o{ share_links : "shared via"
+
+note bottom of folders
+  - depth <= 10 enforced in app logic
+  - unique sibling name: unique(parent_id, lower(name))
+end note
+
+note right of links
+  ON DELETE CASCADE from folders:
+  deleting a folder removes all
+  descendant folders and links
+end note
+
+@enduml

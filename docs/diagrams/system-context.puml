@@ -1,0 +1,22 @@
+@startuml system-context
+title Link — System Context Diagram (C4 Level 1)
+
+actor "Curator\n(authenticated user)" as curator
+actor "Visitor\n(anonymous, no account)" as visitor
+
+rectangle "Link\nURL organizer web app\n(Next.js + PostgreSQL,\nDockerized)" as link
+
+cloud "Target Websites" as sites
+
+curator --> link : HTTPS\nmanage folders & links,\ncreate/revoke share links
+visitor --> link : HTTPS via share URL\n/read/<token>\nbrowse shared subtree read-only
+link --> sites : GET http(s)\nOG/meta metadata scraping\n(SSRF-guarded)
+
+note bottom of link
+  Deployed via docker compose:
+  - app container (Next.js standalone)
+  - postgres container (volume-backed)
+  Behind optional TLS reverse proxy.
+end note
+
+@enduml

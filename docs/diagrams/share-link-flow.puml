@@ -1,0 +1,48 @@
+@startuml share-link-flow
+title Link — Share Link Creation & Anonymous Access
+
+actor Curator
+participant "Folder UI" as ui
+participant "createShare()\nserver action" as create
+database "PostgreSQL" as db
+
+actor Visitor
+participant "GET /share/[token]" as page
+participant "share queries\n(resolveSubtree CTE)" as resolve
+
+== Create Share ==
+Curator -> ui : click "Share folder"
+ui -> create : { folderId }
+activate create
+create -> create : auth check\nownership check (owner_id)
+create -> create : token = nanoid(21)\n(~126-bit entropy)
+create -> db : INSERT share_links\n(token, folder_id, created_by)
+db --> create : id
+create --> ui : share URL\n/share/<token>
+deactivate create
+Curator -> Curator : copy & distribute URL
+
+== Anonymous Access ==
+Visitor -> page : GET /share/[token]
+activate page
+page -> db : SELECT share WHERE token = ?\nAND revoked_at IS NULL\nAND not expired
+alt valid share
+  page -> resolve : subtree(folder_id)
+  activate resolve
+  resolve -> db : recursive CTE\n(folders + links of whole subtree)
+  db --> resolve : tree data
+  resolve --> page : read-only tree
+  deactivate resolve
+  page --> Visitor : 200 — folder view\n(mutations hidden,\nread-only banner)
+else invalid / revoked / expired
+  page --> Visitor : 404-style page
+end
+deactivate page
+
+== Revoke ==
+Curator -> ui : revoke share
+ui -> create : revokeShare(shareId)\n(auth + ownership)
+create -> db : UPDATE share_links\nSET revoked_at = now()
+note right : all existing tokens\nstop working immediately
+
+@enduml

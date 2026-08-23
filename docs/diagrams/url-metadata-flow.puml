@@ -1,0 +1,39 @@
+@startuml url-metadata-flow
+title Link — URL Metadata Fetch Flow
+
+actor Curator
+participant "LinkForm\n(client)" as form
+participant "POST /api/links/metadata" as api
+participant "metadata-fetcher.ts" as fetcher
+participant "Target Website" as web
+database "PostgreSQL" as db
+
+Curator -> form : paste URL
+form -> api : { url }
+activate api
+api -> api : Zod validate\n(http/https only)
+
+api -> fetcher : fetchMetadata(url)
+activate fetcher
+fetcher -> fetcher : DNS resolve\nreject private/reserved IPs\n(SSRF guard)
+fetcher -> web : GET url\n(timeout 10s, max 2MB)
+web --> fetcher : HTML
+fetcher -> fetcher : follow redirects\n(re-validate each hop)
+fetcher -> fetcher : parse og:title, og:description,\nog:image; fallback <title>,\n<meta description>, /favicon.ico
+fetcher --> api : metadata | FetchError
+deactivate fetcher
+
+alt success
+  api --> form : 200 { title, description,\n          favicon_url, image_url }
+else failure
+  api --> form : 200 {} (empty)\nmanual entry required
+end
+deactivate api
+
+form -> Curator : pre-filled fields\n(user can edit)
+Curator -> form : save
+form -> form : serverAction createLink()\nZod validate + ownership check
+form -> db : INSERT links
+db --> form : ok
+
+@enduml

@@ -1,0 +1,53 @@
+@startuml deployment-architecture
+title Link — Deployment Architecture (Docker Compose)
+
+node "Host machine" {
+
+  node "docker compose" as compose {
+
+    node "app container\n(next: standalone build)" as app {
+      artifact "Node.js 22 alpine" as node
+      artifact "Next.js 15 server :3000" as next
+      artifact "entrypoint:\ndrizzle-kit migrate → start" as entry
+    }
+
+    database "postgres container\n(postgres:16-alpine)" as pg {
+      folder "pgdata (named volume)" as vol
+    }
+  }
+
+  cloud "Reverse proxy\n(Caddy / Traefik / nginx)\nTLS termination — optional,\nrecommended" as proxy
+}
+
+actor Curator
+actor Visitor
+
+Curator --> proxy : HTTPS
+Visitor --> proxy : HTTPS /share/<token>
+proxy --> app : HTTP :3000
+
+app --> pg : postgres://…\n(DATABASE_URL, internal network)
+
+note right of pg
+  healthcheck: pg_isready
+  app depends_on:
+    condition: service_healthy
+end note
+
+note bottom of app
+  Env vars (.env):
+  DATABASE_URL
+  BETTER_AUTH_SECRET
+  BETTER_AUTH_URL
+  NODE_ENV=production
+
+  Migrations run automatically at
+  startup before server starts.
+end note
+
+note bottom of compose
+  docker compose up -d
+  = full MVP deployment
+end note
+
+@enduml

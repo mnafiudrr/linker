@@ -1,0 +1,70 @@
+@startuml folder-tree-structure
+title Link — Folder Tree Structure & Share Scope
+
+skinparam defaultTextAlignment center
+
+class "folders (tree)" as tree {
+  owner_id : uuid
+  parent_id : uuid?
+  name : text
+}
+
+note as N1
+  n-ary tree via self-referencing
+  parent_id. Root folders have
+  parent_id = NULL.
+
+  Depth limit: 10 levels
+  (validated on create/move).
+end note
+tree .. N1
+
+package "Example ownership tree" {
+  folder "Home" as f0
+  folder "Work" as f1
+  folder "Projects" as f2
+  folder "Reading" as f3
+  card link1 [GitHub repo]
+  card link2 [Design doc]
+
+  f0 --> f1
+  f0 --> f3
+  f1 --> f2
+  f2 --> link1
+  f2 --> link2
+}
+
+package "Share scope example\n(share on 'Projects')" {
+  folder "Projects ✓" as s2 #LightGreen
+  card slink1 [GitHub repo] #LightGreen
+  card slink2 [Design doc] #LightGreen
+
+  note right of s2
+    Visitor sees ONLY this subtree.
+    Siblings ("Work", "Reading")
+    and their contents are
+    invisible — not just locked.
+  end note
+}
+
+f2 ..> s2 : resolved by\nrecursive CTE
+
+note as N2
+  Subtree resolution SQL:
+
+  WITH RECURSIVE subtree AS (
+    SELECT id FROM folders WHERE id = $1
+    UNION ALL
+    SELECT f.id FROM folders f
+    JOIN subtree s ON f.parent_id = s.id
+  )
+
+  Reused for:
+  - share rendering (FR-13)
+  - move-cycle prevention (FR-04):
+    reject moving X into a
+    descendant of X
+end note
+N2 .. resolve
+
+@enduml
