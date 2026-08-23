@@ -93,9 +93,11 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export function FolderTree({
   folders,
   shared,
+  collaborations,
 }: {
   folders: SidebarFolder[];
   shared?: SidebarSharedFolder[];
+  collaborations?: Array<{ id: string; name: string }>;
 }) {
   const tree = buildTree(folders);
 
@@ -125,6 +127,19 @@ export function FolderTree({
             {shared.map((entry) => (
               <li key={entry.id}>
                 <SharedEntry shared={entry} />
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
+
+      {collaborations && collaborations.length > 0 ? (
+        <>
+          <SectionLabel>Shared with me</SectionLabel>
+          <ul>
+            {collaborations.map((entry) => (
+              <li key={entry.id}>
+                <CollabEntry folder={entry} />
               </li>
             ))}
           </ul>
@@ -166,6 +181,25 @@ function SharedEntry({ shared }: { shared: SidebarSharedFolder }) {
         🔗
       </span>
       <span className="truncate">{shared.name}</span>
+    </Link>
+  );
+}
+
+function CollabEntry({ folder }: { folder: { id: string; name: string } }) {
+  const pathname = usePathname();
+  const isActive = pathname === `/dashboard/folder/${folder.id}`;
+  return (
+    <Link
+      href={`/dashboard/folder/${folder.id}`}
+      className={cn(
+        "flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm",
+        isActive ? "bg-primary-100 text-on-primary" : "hover:bg-base",
+      )}
+    >
+      <span aria-hidden="true" className="text-accent-lilac">
+        👥
+      </span>
+      <span className="truncate">{folder.name}</span>
     </Link>
   );
 }
