@@ -64,15 +64,15 @@ link/
 ## 3. Data Model
 
 ```ts
-// users — managed by Better Auth
-users(id uuid pk, name text, email text unique, email_verified bool,
+// users — managed by Better Auth (text ids, per Better Auth defaults)
+users(id text pk, name text, email text unique, email_verified bool,
       image text, created_at timestamptz, updated_at timestamptz)
 sessions(id text pk, user_id fk→users, expires_at, ...)
 accounts(id text pk, user_id fk→users, ...) // credential provider
 
 folders(
   id         uuid pk default gen_random_uuid(),
-  owner_id   uuid not null fk→users(id) on delete cascade,
+  owner_id   text not null fk→users(id) on delete cascade,
   parent_id  uuid null fk→folders(id) on delete cascade, -- self-ref tree
   name       text not null,
   created_at timestamptz not null default now(),

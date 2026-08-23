@@ -1,6 +1,6 @@
 # 001 — Database Schema & Migrations
 
-- **Status:** pending
+- **Status:** done
 - **Depends on:** [000]
 
 ## Goal
