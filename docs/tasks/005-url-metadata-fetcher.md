@@ -1,6 +1,6 @@
 # 005 — URL Metadata Fetcher
 
-- **Status:** pending
+- **Status:** done
 - **Depends on:** [004]
 
 ## Goal
