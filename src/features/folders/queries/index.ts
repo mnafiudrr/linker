@@ -1,10 +1,10 @@
 import "server-only";
 
-import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, isNull, or, sql } from "drizzle-orm";
 
 import type { Database } from "@/db";
 import { getDb } from "@/db";
-import { folders, links, type Folder, type Link } from "@/db/schema";
+import { folders, links, shareLinks, type Folder, type Link } from "@/db/schema";
 
 export type FolderWithContents = {
   folder: Folder;
@@ -26,6 +26,29 @@ export function getAllOwnedFolders(ownerId: string) {
     .select({ id: folders.id, name: folders.name, parentId: folders.parentId })
     .from(folders)
     .where(eq(folders.ownerId, ownerId))
+    .orderBy(asc(folders.name));
+}
+
+/**
+ * Owned folders that currently have an active share link — rendered as the
+ * sidebar's "Shared" group. Active = not revoked and not expired.
+ */
+export function getSharedFolders(ownerId: string) {
+  return getDb()
+    .selectDistinct({
+      id: folders.id,
+      name: folders.name,
+      token: shareLinks.token,
+    })
+    .from(shareLinks)
+    .innerJoin(folders, eq(folders.id, shareLinks.folderId))
+    .where(
+      and(
+        eq(shareLinks.createdBy, ownerId),
+        isNull(shareLinks.revokedAt),
+        or(isNull(shareLinks.expiresAt), gt(shareLinks.expiresAt, sql`now()`)),
+      ),
+    )
     .orderBy(asc(folders.name));
 }
 

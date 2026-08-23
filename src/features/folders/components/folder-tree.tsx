@@ -12,6 +12,12 @@ export type SidebarFolder = {
   parentId: string | null;
 };
 
+export type SidebarSharedFolder = {
+  id: string;
+  name: string;
+  token: string;
+};
+
 type TreeNode = SidebarFolder & { children: TreeNode[] };
 
 function buildTree(folders: SidebarFolder[]): TreeNode[] {
@@ -76,24 +82,90 @@ function TreeItem({ node, depth }: { node: TreeNode; depth: number }) {
   );
 }
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-content-muted">
+      {children}
+    </p>
+  );
+}
+
 export function FolderTree({
   folders,
+  shared,
 }: {
   folders: SidebarFolder[];
+  shared?: SidebarSharedFolder[];
 }) {
   const tree = buildTree(folders);
 
   return (
-    <nav aria-label="Folders" className="flex flex-col gap-2">
+    <nav aria-label="Folders" className="flex flex-col">
+      {/* Pinned root entry */}
+      <ul>
+        <li>
+          <RootEntry />
+        </li>
+      </ul>
+
       {tree.length === 0 ? (
-        <p className="px-2 py-4 text-xs text-content-muted">No folders yet.</p>
+        <p className="px-2 py-2 text-xs text-content-muted">No folders yet.</p>
       ) : (
-        <ul>
+        <ul className="mt-1">
           {tree.map((node) => (
             <TreeItem key={node.id} node={node} depth={0} />
           ))}
         </ul>
       )}
+
+      {shared && shared.length > 0 ? (
+        <>
+          <SectionLabel>Shared</SectionLabel>
+          <ul>
+            {shared.map((entry) => (
+              <li key={entry.id}>
+                <SharedEntry shared={entry} />
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
     </nav>
+  );
+}
+
+function RootEntry() {
+  const pathname = usePathname();
+  const isActive = pathname === "/dashboard";
+  return (
+    <Link
+      href="/dashboard"
+      className={cn(
+        "flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium",
+        isActive ? "bg-primary-100 text-on-primary" : "hover:bg-base",
+      )}
+    >
+      🏠 My links
+    </Link>
+  );
+}
+
+function SharedEntry({ shared }: { shared: SidebarSharedFolder }) {
+  const pathname = usePathname();
+  const isActive = pathname === `/dashboard/folder/${shared.id}`;
+  return (
+    <Link
+      href={`/dashboard/folder/${shared.id}`}
+      title={`Publicly shared (${shared.token})`}
+      className={cn(
+        "flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm",
+        isActive ? "bg-primary-100 text-on-primary" : "hover:bg-base",
+      )}
+    >
+      <span aria-hidden="true" className="text-accent-peach">
+        🔗
+      </span>
+      <span className="truncate">{shared.name}</span>
+    </Link>
   );
 }

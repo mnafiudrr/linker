@@ -1,6 +1,6 @@
 import { requireUser } from "@/features/auth/session";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
-import { getAllOwnedFolders } from "@/features/folders/queries";
+import { getAllOwnedFolders, getSharedFolders } from "@/features/folders/queries";
 import { FolderTree } from "@/features/folders/components/folder-tree";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
@@ -8,7 +8,10 @@ export default async function DashboardLayout({
   children,
 }: LayoutProps<"/dashboard">) {
   const session = await requireUser();
-  const folders = await getAllOwnedFolders(session.user.id);
+  const [folders, sharedFolders] = await Promise.all([
+    getAllOwnedFolders(session.user.id),
+    getSharedFolders(session.user.id),
+  ]);
 
   return (
     <div className="flex min-h-screen">
@@ -18,7 +21,7 @@ export default async function DashboardLayout({
           <ThemeToggle />
         </div>
         <div className="flex-1 overflow-y-auto">
-          <FolderTree folders={folders} />
+          <FolderTree folders={folders} shared={sharedFolders} />
         </div>
         <div className="mt-2 flex items-center justify-between gap-2 rounded-lg px-2 py-1.5">
           <span className="truncate text-xs text-content-secondary">
