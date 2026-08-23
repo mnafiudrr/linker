@@ -71,8 +71,8 @@ async function isInSubtree(
 }
 
 /**
- * Ancestor chain within the share scope only: from the share root down to
- * the current folder.
+ * Full breadcrumb within the share scope, inclusive of the current folder:
+ * [share root, ..., current]. Ancestors above the share root are never read.
  */
 async function getScopedBreadcrumb(
   db: Database,
@@ -98,15 +98,28 @@ async function getScopedBreadcrumb(
       SELECT f.id, f.parent_id, f.name, c.depth + 1
       FROM folders f JOIN chain c ON f.id = c.parent_id AND c.id != ${rootId}
     )
-    SELECT id, name, depth FROM chain WHERE id != ${currentId} ORDER BY depth DESC
+    SELECT id, name, depth FROM chain WHERE depth > 0 ORDER BY depth ASC
   `);
 
-  const breadcrumb: Array<Pick<Folder, "id" | "name">> = [];
+  // Walk from the deepest ancestor down to the share root (inclusive),
+  // then flip so the breadcrumb reads root → … → parent.
+  const ancestors: Array<Pick<Folder, "id" | "name">> = [];
+  let reachedRoot = false;
   for (const row of rows) {
-    breadcrumb.push({ id: row.id, name: row.name });
-    if (row.id === rootId) break; // never expose anything above the share root
+    ancestors.push({ id: row.id, name: row.name });
+    if (row.id === rootId) {
+      reachedRoot = true;
+      break;
+    }
   }
   // The walk must have reached the share root — otherwise out of scope.
-  if (!breadcrumb.some((entry) => entry.id === rootId)) return [];
-  return breadcrumb;
+  if (!reachedRoot) return [];
+
+  const [current] = await db
+    .select({ id: folders.id, name: folders.name })
+    .from(folders)
+    .where(eq(folders.id, currentId))
+    .limit(1);
+
+  return [...ancestors.reverse(), ...(current ? [current] : [])];
 }
