@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, Field, FormError } from "@/components/ui/dialog";
 import { deleteFolder, moveFolder, renameFolder } from "@/features/folders/actions";
+import { CollaboratorsSection } from "@/features/collaboration/components/collaborators-section";
 
 export type FolderActionsData = {
   id: string;
@@ -16,11 +17,18 @@ export type FolderActionsData = {
 export function EditFolderDialog({
   folder,
   folders,
+  collaborators = [],
   trigger,
 }: {
   folder: FolderActionsData;
   /** All owned folders (id + name) — used for the move target select. */
   folders: Array<{ id: string; name: string }>;
+  collaborators?: Array<{
+    id: string;
+    email: string;
+    role: "editor" | "viewer";
+    status: "pending" | "accepted" | "rejected";
+  }>;
   trigger: React.ReactNode;
 }) {
   const router = useRouter();
@@ -135,6 +143,8 @@ export function EditFolderDialog({
               </div>
             </form>
           ) : null}
+
+          <CollaboratorsSection folderId={folder.id} collaborators={collaborators} />
 
           <div className="flex items-center justify-between border-t border-line pt-4">
             <Button variant="danger" onClick={() => handleDelete(close)} disabled={pending}>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { getDb } from "@/db";
 import { requireUser } from "@/features/auth/session";
 import {
   getAllOwnedFolders,
@@ -15,7 +16,13 @@ import { EditLinkDialog } from "@/features/links/components/edit-link-dialog";
 import { ShareDialog } from "@/features/share/components/share-dialog";
 import { getActiveSharesForFolder } from "@/features/share/service";
 import { LinkCard } from "@/features/links/components/link-card";
-import { getDb } from "@/db";
+import { getCollaborators } from "@/features/collaboration/service";
+
+const roleBadge: Record<string, string> = {
+  owner: "bg-accent-peach-soft text-content-secondary",
+  editor: "bg-accent-lilac-soft text-content-secondary",
+  viewer: "bg-subtle text-content-muted",
+};
 
 export default async function FolderPage({
   params,
@@ -23,63 +30,96 @@ export default async function FolderPage({
   const { id } = await params;
   const session = await requireUser();
 
-  const [contents, breadcrumb, folders, shares] = await Promise.all([
+  const [contents, breadcrumb, ownedFolders] = await Promise.all([
     getFolderContents(session.user.id, id),
     getBreadcrumb(session.user.id, id),
     getAllOwnedFolders(session.user.id),
-    getActiveSharesForFolder(getDb(), session.user.id, id),
   ]);
 
   if (!contents || !breadcrumb) notFound();
 
   const { folder, subfolders, links } = contents;
-  const moveTargets = folders.map(({ id: folderId, name }) => ({ id: folderId, name }));
+
+  const isOwner = contents.access === "owner";
+
+  // Owner-only extras (shares + collaborator management).
+  const [shares, collaborators] = await Promise.all([
+    isOwner
+      ? getActiveSharesForFolder(getDb(), session.user.id, id)
+      : Promise.resolve([]),
+    isOwner ? getCollaborators(getDb(), session.user.id, id) : Promise.resolve([]),
+  ]);
+
+  const canEdit = contents.access !== "viewer";
+  const moveTargets = ownedFolders.map(({ id: folderId, name }) => ({ id: folderId, name }));
+  void shares;
 
   return (
     <>
       <header className="border-b border-line px-4 py-4 md:px-8">
         <nav aria-label="Breadcrumb" className="mb-2 text-xs text-content-muted">
           <Link href="/dashboard" className="hover:text-content-secondary">
-            Home
+            My links
           </Link>
           {breadcrumb.map((crumb, index) => (
             <span key={crumb.id}>
               {" / "}
-              {index === breadcrumb.length - 1 ? (
-                <span className="font-medium text-content">{crumb.name}</span>
-              ) : (
-                <Link
-                  href={`/dashboard/folder/${crumb.id}`}
-                  className="hover:text-content-secondary"
-                >
-                  {crumb.name}
-                </Link>
-              )}
+              <Link
+                href={`/dashboard/folder/${crumb.id}`}
+                className={
+                  index === breadcrumb.length - 1
+                    ? "font-medium text-content"
+                    : "hover:text-content-secondary"
+                }
+              >
+                {crumb.name}
+              </Link>
             </span>
           ))}
         </nav>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="truncate text-2xl font-semibold tracking-tight">{folder.name}</h1>
-          <div className="flex items-center gap-2">
-            <EditFolderDialog
-              folder={{ id: folder.id, name: folder.name, parentId: folder.parentId }}
-              folders={moveTargets}
-              trigger={<Button variant="ghost">Settings</Button>}
-            />
-            <ShareDialog
-              folderId={folder.id}
-              folderName={folder.name}
-              shares={shares.map(({ id, token }) => ({ id, token }))}
-            />
-            <CreateFolderDialog
-              parentId={folder.id}
-              trigger={<Button variant="secondary">+ New folder</Button>}
-            />
-            <AddLinkDialog
-              folderId={folder.id}
-              trigger={<Button variant="primary">+ Add link</Button>}
-            />
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={`rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${roleBadge[contents.access]}`}
+            >
+              {contents.access === "owner" ? "owner" : `${contents.access} · shared`}
+            </span>
+            {canEdit ? (
+              <>
+                <EditFolderDialog
+                  folder={{ id: folder.id, name: folder.name, parentId: folder.parentId }}
+                  folders={moveTargets}
+                  collaborators={
+                    isOwner
+                      ? collaborators.map(({ id, collaboratorEmail, role, status }) => ({
+                          id,
+                          email: collaboratorEmail,
+                          role,
+                          status,
+                        }))
+                      : []
+                  }
+                  trigger={<Button variant="ghost">Settings</Button>}
+                />
+                {isOwner ? (
+                  <ShareDialog
+                    folderId={folder.id}
+                    folderName={folder.name}
+                    shares={shares.map(({ id, token }) => ({ id, token }))}
+                  />
+                ) : null}
+                <CreateFolderDialog
+                  parentId={folder.id}
+                  trigger={<Button variant="secondary">+ New folder</Button>}
+                />
+                <AddLinkDialog
+                  folderId={folder.id}
+                  trigger={<Button variant="primary">+ Add link</Button>}
+                />
+              </>
+            ) : null}
           </div>
         </div>
       </header>
@@ -91,9 +131,11 @@ export default async function FolderPage({
               🗂️
             </span>
             <p className="text-sm font-medium">This folder is empty.</p>
-            <p className="mt-1 text-xs text-content-muted">
-              Add a subfolder or paste your first link.
-            </p>
+            {canEdit ? (
+              <p className="mt-1 text-xs text-content-muted">
+                Add a subfolder or paste your first link.
+              </p>
+            ) : null}
           </div>
         ) : null}
 
@@ -108,25 +150,27 @@ export default async function FolderPage({
                       {subfolder.name}
                     </h3>
                   </Link>
-                  <div className="absolute right-2 top-2 opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100 max-md:opacity-100">
-                    <EditFolderDialog
-                      folder={{
-                        id: subfolder.id,
-                        name: subfolder.name,
-                        parentId: subfolder.parentId,
-                      }}
-                      folders={moveTargets}
-                      trigger={
-                        <Button
-                          variant="ghost"
-                          aria-label={`Edit ${subfolder.name}`}
-                          className="h-7 px-2 text-xs"
-                        >
-                          Edit
-                        </Button>
-                      }
-                    />
-                  </div>
+                  {canEdit ? (
+                    <div className="absolute right-2 top-2 opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100 max-md:opacity-100">
+                      <EditFolderDialog
+                        folder={{
+                          id: subfolder.id,
+                          name: subfolder.name,
+                          parentId: subfolder.parentId,
+                        }}
+                        folders={moveTargets}
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            aria-label={`Edit ${subfolder.name}`}
+                            className="h-7 px-2 text-xs"
+                          >
+                            Edit
+                          </Button>
+                        }
+                      />
+                    </div>
+                  ) : null}
                 </div>
               </li>
             ))}
@@ -147,27 +191,29 @@ export default async function FolderPage({
                     imageUrl: link.imageUrl,
                   }}
                   actions={
-                    <EditLinkDialog
-                      link={{
-                        id: link.id,
-                        url: link.url,
-                        title: link.title,
-                        description: link.description,
-                        faviconUrl: link.faviconUrl,
-                        imageUrl: link.imageUrl,
-                        folderId: link.folderId,
-                      }}
-                      folders={moveTargets}
-                      trigger={
-                        <Button
-                          variant="secondary"
-                          aria-label={`Edit ${link.title}`}
-                          className="h-7 bg-base/90 px-2 text-xs backdrop-blur"
-                        >
-                          Edit
-                        </Button>
-                      }
-                    />
+                    canEdit ? (
+                      <EditLinkDialog
+                        link={{
+                          id: link.id,
+                          url: link.url,
+                          title: link.title,
+                          description: link.description,
+                          faviconUrl: link.faviconUrl,
+                          imageUrl: link.imageUrl,
+                          folderId: link.folderId,
+                        }}
+                        folders={moveTargets}
+                        trigger={
+                          <Button
+                            variant="secondary"
+                            aria-label={`Edit ${link.title}`}
+                            className="h-7 bg-base/90 px-2 text-xs backdrop-blur"
+                          >
+                            Edit
+                          </Button>
+                        }
+                      />
+                    ) : undefined
                   }
                 />
               </li>
