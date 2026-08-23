@@ -51,7 +51,7 @@ export function NotificationBell({ invites }: { invites: PendingInvite[] }) {
 
       {open ? (
         <div
-          className="absolute right-0 top-10 z-40 w-80 rounded-xl border border-line bg-base p-4 shadow-e2"
+          className="absolute right-0 top-10 z-40 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-line bg-base p-4 shadow-e2 md:left-0 md:right-auto"
           onMouseLeave={() => setOpen(false)}
         >
           <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-content-muted">
