@@ -1,8 +1,13 @@
 import Link from "next/link";
 
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+
 export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-subtle px-4">
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-sm rounded-xl border border-line bg-base p-8 shadow-e2">
         {children}
       </div>
