@@ -49,15 +49,16 @@ afterAll(async () => {
   await db.delete(users).where(eq(users.id, ownerId));
 });
 
-describe("share breadcrumb scope (issue #1 regression)", () => {
-  it("starts the breadcrumb at the share root for a nested folder", async () => {
+describe("share breadcrumb scope (issue #13)", () => {
+  it("returns the full inclusive chain for a nested folder", async () => {
     const view = await getShareView(token, nestedId);
     expect(view).not.toBeNull();
-    // The current folder itself renders as the page heading, so the
-    // breadcrumb only carries ancestors up to (and including) the share root.
     expect(view?.breadcrumb.map((entry) => entry.name)).toEqual([
       expect.stringContaining("Shared-"),
+      "Nested",
     ]);
+    // Current folder is the last crumb.
+    expect(view?.breadcrumb.at(-1)?.id).toBe(nestedId);
   });
 
   it("never exposes ancestor folders above the share root", async () => {

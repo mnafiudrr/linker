@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getShareView } from "@/features/share/queries";
 import { ShareLinkCard } from "@/features/links/components/share-link-card";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Shared folder" };
 
@@ -62,13 +63,15 @@ export default async function SharePage({
             return (
               <span key={crumb.id}>
                 {index > 0 ? " / " : ""}
-                {isLast ? (
-                  <span className="font-medium text-content">{crumb.name}</span>
-                ) : (
-                  <Link href={`${shareHref}?f=${crumb.id}`} className="hover:text-content-secondary">
-                    {crumb.name}
-                  </Link>
-                )}
+                <Link
+                  href={`${shareHref}?f=${crumb.id}`}
+                  className={cn(
+                    "hover:text-content-secondary",
+                    isLast ? "font-medium text-content" : "",
+                  )}
+                >
+                  {crumb.name}
+                </Link>
               </span>
             );
           })}
