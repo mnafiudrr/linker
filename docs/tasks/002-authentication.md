@@ -1,6 +1,6 @@
 # 002 — Authentication
 
-- **Status:** pending
+- **Status:** done
 - **Depends on:** [001]
 
 ## Goal
