@@ -34,9 +34,9 @@ export default async function LandingPage() {
         <h1 className="text-4xl font-semibold tracking-tight text-content md:text-5xl">
           Your links, organized.
         </h1>
-        <p className="mt-4 max-w-xl text-sm leading-relaxed text-content-secondary md:text-base">
+        <p className="mt-4 max-w-xl text-sm leading-relaxed text-content-secondary md:text-content">
           Save URLs into folders, enrich them with titles, descriptions and fetched
-          page details — then share any folder publicly with a read-only link.
+          page details, then share any folder publicly with a read-only link.
           No account needed on the visitor side.
         </p>
         <div className="mt-8 flex items-center gap-3">

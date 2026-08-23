@@ -16,6 +16,30 @@ services:
       timeout: 3s
       retries: 10
 
+  # Development server with hot reload — start with:
+  #   docker compose --profile dev up -d dev
+  dev:
+    profiles: ["dev"]
+    build:
+      context: .
+      target: dev
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://link:link@postgres:5432/link
+      BETTER_AUTH_URL: http://localhost:3000
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-dev-secret-do-not-use-in-prod}
+      NODE_ENV: development
+    volumes:
+      - .:/app
+      # Keep dependencies and build cache container-owned so host artifacts
+      # never shadow what npm ci installed inside the image.
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   migrate:
     build:
       context: .
