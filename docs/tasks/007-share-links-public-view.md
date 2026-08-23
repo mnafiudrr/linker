@@ -1,6 +1,6 @@
 # 007 — Share Links & Public View
 
-- **Status:** pending
+- **Status:** done
 - **Depends on:** [006]
 
 ## Goal

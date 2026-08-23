@@ -12,7 +12,10 @@ import { CreateFolderDialog } from "@/features/folders/components/create-folder-
 import { EditFolderDialog } from "@/features/folders/components/edit-folder-dialog";
 import { AddLinkDialog } from "@/features/links/components/add-link-dialog";
 import { EditLinkDialog } from "@/features/links/components/edit-link-dialog";
+import { ShareDialog } from "@/features/share/components/share-dialog";
+import { getActiveSharesForFolder } from "@/features/share/service";
 import { LinkCard } from "@/features/links/components/link-card";
+import { getDb } from "@/db";
 
 export default async function FolderPage({
   params,
@@ -20,10 +23,11 @@ export default async function FolderPage({
   const { id } = await params;
   const session = await requireUser();
 
-  const [contents, breadcrumb, folders] = await Promise.all([
+  const [contents, breadcrumb, folders, shares] = await Promise.all([
     getFolderContents(session.user.id, id),
     getBreadcrumb(session.user.id, id),
     getAllOwnedFolders(session.user.id),
+    getActiveSharesForFolder(getDb(), session.user.id, id),
   ]);
 
   if (!contents || !breadcrumb) notFound();
@@ -62,6 +66,11 @@ export default async function FolderPage({
               folder={{ id: folder.id, name: folder.name, parentId: folder.parentId }}
               folders={moveTargets}
               trigger={<Button variant="ghost">Settings</Button>}
+            />
+            <ShareDialog
+              folderId={folder.id}
+              folderName={folder.name}
+              shares={shares.map(({ id, token }) => ({ id, token }))}
             />
             <CreateFolderDialog
               parentId={folder.id}
