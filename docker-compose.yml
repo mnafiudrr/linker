@@ -43,7 +43,7 @@ services:
   migrate:
     build:
       context: .
-      target: build
+      target: migrate
     environment: &app-env
       DATABASE_URL: postgres://${POSTGRES_USER:-link}:${POSTGRES_PASSWORD:-link}@postgres:5432/${POSTGRES_DB:-link}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:${APP_PORT:-3000}}
