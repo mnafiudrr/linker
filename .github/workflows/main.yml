@@ -1,0 +1,19 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches:
+      - development
+      - master
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        options:
+          - staging
+          - production
+      tag:
+        description: 'Image tag to deploy (leave empty for auto)'
+        required: false
+
